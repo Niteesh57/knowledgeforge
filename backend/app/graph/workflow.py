@@ -9,9 +9,10 @@ from app.agents.cli_agent import generate_cli
 from app.agents.browser_agent import generate_browser
 from app.agents.game_agent import generate_game
 from app.agents.codebook_agent import generate_codebook
+from app.agents.game_proposal_agent import generate_game_proposal
 
 # Define the router transition
-def decider_router(state: AgentState) -> Literal["COMIC", "ESCAPE_ROOM", "SIMULATION", "CLI", "BROWSER", "GAME", "CODEBOOK"]:
+def decider_router(state: AgentState) -> Literal["COMIC", "ESCAPE_ROOM", "SIMULATION", "CLI", "BROWSER", "GAME", "CODEBOOK", "GAME_PROPOSAL"]:
   return state["router_decision"] or "CLI"
 
 # Build State Graph
@@ -25,6 +26,7 @@ workflow.add_node("SIMULATION", generate_simulation)
 workflow.add_node("CLI", generate_cli)
 workflow.add_node("BROWSER", generate_browser)
 workflow.add_node("GAME", generate_game)
+workflow.add_node("GAME_PROPOSAL", generate_game_proposal)
 workflow.add_node("CODEBOOK", generate_codebook)
 
 # Set Entry Point
@@ -41,6 +43,7 @@ workflow.add_conditional_edges(
         "CLI":         "CLI",
         "BROWSER":     "BROWSER",
         "GAME":        "GAME",
+        "GAME_PROPOSAL": "GAME_PROPOSAL",
         "CODEBOOK":    "CODEBOOK",
     }
 )
@@ -52,6 +55,7 @@ workflow.add_edge("SIMULATION",  END)
 workflow.add_edge("CLI",         END)
 workflow.add_edge("BROWSER",     END)
 workflow.add_edge("GAME",        END)
+workflow.add_edge("GAME_PROPOSAL", END)
 workflow.add_edge("CODEBOOK",    END)
 
 app_graph = workflow.compile()

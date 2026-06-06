@@ -21,11 +21,13 @@ app.add_middleware(
 class GenerateRequest(BaseModel):
     concept: str
     medium: Optional[str] = None
+    template: Optional[str] = None
 
-async def generate_experience(concept: str, selected_medium: Optional[str] = None):
+async def generate_experience(concept: str, selected_medium: Optional[str] = None, selected_template: Optional[str] = None):
     initial_state = {
         "concept": concept,
         "selected_medium": selected_medium,
+        "selected_template": selected_template,
         "router_decision": None,
         "template": None,
         "title": None,
@@ -45,7 +47,7 @@ async def generate_experience(concept: str, selected_medium: Optional[str] = Non
 
 @app.post("/generate")
 async def generate_endpoint(request: GenerateRequest):
-    result = await generate_experience(request.concept, request.medium)
+    result = await generate_experience(request.concept, request.medium, request.template)
     return result
 
 @app.get("/")
