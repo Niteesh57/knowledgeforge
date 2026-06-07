@@ -1,0 +1,574 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-fixed-dim: var(--theme-primary);
+  --color-on-primary-fixed: var(--theme-on-primary-fixed);
+  --color-on-primary: var(--theme-on-primary);
+  --color-primary-container: var(--theme-primary-container);
+  --color-on-primary-container: var(--theme-on-primary-container);
+  --color-primary-fixed: var(--theme-primary-fixed);
+  --color-primary: var(--theme-primary-light);
+
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container: #201f1f;
+  --color-surface-container-highest: #353534;
+  --color-background: #131313;
+  --color-surface: #131313;
+  --color-surface-dim: #131313;
+  --color-surface-bright: #393939;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #b9ccb2;
+  --color-on-background: #e5e2e1;
+
+  --color-secondary: #bec7db;
+  --color-secondary-fixed: #dae3f7;
+  --color-secondary-fixed-dim: #bec7db;
+  --color-on-secondary: #283140;
+  --color-on-secondary-fixed: #131c2a;
+  --color-secondary-container: #3e4758;
+  --color-on-secondary-container: #acb5c9;
+  --color-on-secondary-fixed-variant: #3e4758;
+
+  --color-tertiary: #fff8f2;
+  --color-tertiary-fixed: #ffddaf;
+  --color-tertiary-fixed-dim: #ffba43;
+  --color-on-tertiary: #432c00;
+  --color-on-tertiary-fixed: #281800;
+  --color-tertiary-container: #ffd69b;
+  --color-on-tertiary-container: #835800;
+  --color-on-tertiary-fixed-variant: #614000;
+
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+
+  --color-outline: #84967e;
+  --color-outline-variant: #3b4b37;
+  --color-surface-tint: var(--theme-primary);
+
+  --font-label-caps: 'Space Mono', monospace;
+  --font-body-lg: 'Space Mono', monospace;
+  --font-headline-lg-mobile: 'Space Mono', monospace;
+  --font-body-sm: 'Space Mono', monospace;
+  --font-headline-lg: 'Space Mono', monospace;
+  --font-headline-md: 'Space Mono', monospace;
+  
+  --spacing-gutter: 1rem;
+}
+
+:root {
+  /* Default Color Theme: Neon Green */
+  --theme-primary: #00e639;
+  --theme-on-primary-fixed: #002203;
+  --theme-on-primary: #003907;
+  --theme-primary-container: #00ff41;
+  --theme-on-primary-container: #007117;
+  --theme-primary-fixed: #72ff70;
+  --theme-primary-light: #ebffe2;
+  --theme-glow: rgba(0, 230, 57, 0.6);
+  --theme-glow-light: rgba(0, 230, 57, 0.15);
+  --theme-glow-border: rgba(0, 230, 57, 0.3);
+}
+
+.theme-amber {
+  --theme-primary: #ffb000;
+  --theme-on-primary-fixed: #281800;
+  --theme-on-primary: #432c00;
+  --theme-primary-container: #ffd69b;
+  --theme-on-primary-container: #835800;
+  --theme-primary-fixed: #ffddaf;
+  --theme-primary-light: #fff8f2;
+  --theme-glow: rgba(255, 176, 0, 0.6);
+  --theme-glow-light: rgba(255, 176, 0, 0.15);
+  --theme-glow-border: rgba(255, 176, 0, 0.3);
+}
+
+.theme-blue {
+  --theme-primary: #00bfff;
+  --theme-on-primary-fixed: #001c2a;
+  --theme-on-primary: #00334d;
+  --theme-primary-container: #b3e6ff;
+  --theme-on-primary-container: #007399;
+  --theme-primary-fixed: #80d8ff;
+  --theme-primary-light: #e6f7ff;
+  --theme-glow: rgba(0, 191, 255, 0.6);
+  --theme-glow-light: rgba(0, 191, 255, 0.15);
+  --theme-glow-border: rgba(0, 191, 255, 0.3);
+}
+
+.theme-rose {
+  --theme-primary: #ff007f;
+  --theme-on-primary-fixed: #2a0013;
+  --theme-on-primary: #4d0023;
+  --theme-primary-container: #ffb3d9;
+  --theme-on-primary-container: #99004d;
+  --theme-primary-fixed: #ff80bf;
+  --theme-primary-light: #ffe6f2;
+  --theme-glow: rgba(255, 0, 127, 0.6);
+  --theme-glow-light: rgba(255, 0, 127, 0.15);
+  --theme-glow-border: rgba(255, 0, 127, 0.3);
+}
+
+/* Retro Bevel Styles */
+.bevel-raised {
+  border-top: 1px solid #2A2A2A;
+  border-left: 1px solid #2A2A2A;
+  border-bottom: 1px solid #080808;
+  border-right: 1px solid #080808;
+}
+
+.bevel-sunken {
+  border-top: 1px solid #080808;
+  border-left: 1px solid #080808;
+  border-bottom: 1px solid #2A2A2A;
+  border-right: 1px solid #2A2A2A;
+}
+
+.bevel-active:active {
+  border-top: 1px solid #080808;
+  border-left: 1px solid #080808;
+  border-bottom: 1px solid #2A2A2A;
+  border-right: 1px solid #2A2A2A;
+  transform: translateY(1px);
+}
+
+/* Blinking Cursor */
+.cursor-blink {
+  display: inline-block;
+  width: 10px;
+  height: 1.2em;
+  background-color: var(--theme-primary);
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+  box-shadow: 0 0 8px var(--theme-glow);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* CRT Scanline Effect */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+  background-size: 100% 100px;
+  animation: scanline 10s linear infinite;
+  pointer-events: none;
+  z-index: 101;
+  opacity: 0.1;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Pulsing UI Elements */
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--theme-glow-light);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 15px var(--theme-glow);
+    opacity: 1;
+  }
+}
+
+/* Entrance Animations */
+.fade-in-slide {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fade-in-slide 0.5s ease-out forwards;
+}
+
+@keyframes fade-in-slide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Faint Text Flicker */
+.text-flicker {
+  animation: text-flicker 4s linear infinite;
+}
+
+@keyframes text-flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 0.7;
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.4;
+  }
+}
+
+/* Card Hover Effects */
+.action-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px var(--theme-glow-light);
+  border-color: var(--theme-glow-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanlines,
+  .pulse-glow,
+  .fade-in-slide,
+  .text-flicker,
+  .action-card,
+  .cursor-blink {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Custom Scrollbar for Retro Feel */
+::-webkit-scrollbar {
+  width: 12px;
+  background: #0e0e0e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1c1b1b;
+  border: 1px solid #2A2A2A;
+  border-right: 1px solid #080808;
+  border-bottom: 1px solid #080808;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: 'Space Mono', monospace;
+  margin: 0;
+  padding: 0;
+}
+
+/* Era 2000s (Light Win95 Theme) */
+.theme-amber.era-2000s,
+.theme-blue.era-2000s,
+.theme-rose.era-2000s,
+.theme-green.era-2000s,
+.era-2000s {
+  --theme-primary: #000080;
+  --theme-on-primary-fixed: #00006e;
+  --theme-on-primary: #ffffff;
+  --theme-primary-container: #000080;
+  --theme-on-primary-container: #ffffff;
+  --theme-primary-fixed: #e0e0ff;
+  --theme-primary-light: #bfc2ff;
+  --theme-glow: rgba(0, 0, 128, 0.4);
+  --theme-glow-light: rgba(0, 0, 128, 0.1);
+  --theme-glow-border: rgba(0, 0, 128, 0.2);
+
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e9e8e8;
+  --color-surface-container-low: #f5f3f3;
+  --color-surface-container: #efeded;
+  --color-surface-container-highest: #e3e2e2;
+  --color-background: #faf9f9;
+  --color-surface: #faf9f9;
+  --color-surface-dim: #dbdad9;
+  --color-surface-bright: #faf9f9;
+  --color-on-surface: #1b1c1c;
+  --color-on-surface-variant: #464653;
+  --color-on-background: #1b1c1c;
+  --color-primary-fixed-dim: #000080;
+}
+
+/* Dynamic Font Overrides in 2000s Era */
+.era-2000s {
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+.era-2000s h1,
+.era-2000s h2,
+.era-2000s h3,
+.era-2000s .font-mono,
+.era-2000s .font-label-caps,
+.era-2000s .font-body-lg {
+  font-family: 'Space Mono', monospace !important;
+}
+
+.era-2000s .font-body-sm,
+.era-2000s .text-body-sm,
+.era-2000s .text-label-caps,
+.era-2000s .font-label-caps,
+.era-2000s .font-label-sm,
+.era-2000s .text-label-sm {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Bevel Styling Overrides for Win95 theme */
+.era-2000s .bevel-raised {
+  box-shadow: inset 1.5px 1.5px 0px 0px #ffffff, inset -1.5px -1.5px 0px 0px #808080, 0.5px 0.5px 0px 0px #000000 !important;
+  background: #efeded !important;
+  border: none !important;
+}
+
+.era-2000s .bevel-sunken {
+  box-shadow: inset 1.5px 1.5px 0px 0px #808080, inset -1.5px -1.5px 0px 0px #ffffff !important;
+  background: #ffffff !important;
+  border: none !important;
+}
+
+.era-2000s .bevel-active:active {
+  box-shadow: inset 1.5px 1.5px 0px 0px #808080, inset -1.5px -1.5px 0px 0px #ffffff !important;
+  border: none !important;
+  transform: none !important;
+}
+
+/* Win95 Scrollbars */
+.era-2000s ::-webkit-scrollbar {
+  width: 16px;
+  background: #efeded;
+  box-shadow: inset 1px 1px 0px #808080;
+}
+
+.era-2000s ::-webkit-scrollbar-thumb {
+  background: #efeded;
+  box-shadow: inset 1.5px 1.5px 0px 0px #ffffff, inset -1.5px -1.5px 0px 0px #808080, 0.5px 0.5px 0px 0px #000000;
+  border: none;
+}
+
+/* Custom Win95 Theme Helpers */
+.win95-raised {
+  box-shadow: inset 1.5px 1.5px 0px 0px #ffffff, inset -1.5px -1.5px 0px 0px #808080, 0.5px 0.5px 0px 0px #000000;
+  background: #efeded;
+}
+
+.win95-sunken {
+  box-shadow: inset 1.5px 1.5px 0px 0px #808080, inset -1.5px -1.5px 0px 0px #ffffff;
+  background: #ffffff;
+}
+
+.win95-sunken-field {
+  box-shadow: inset 2px 2px 0px 0px #808080, inset -2px -2px 0px 0px #ffffff, 0.5px 0.5px 0px 0px #000000;
+}
+
+.win95-button:active {
+  box-shadow: inset 1.5px 1.5px 0px 0px #808080, inset -1.5px -1.5px 0px 0px #ffffff;
+  padding-top: 2px;
+  padding-left: 2px;
+}
+
+.dither-bg {
+  background-image: radial-gradient(#c0c0c0 1px, transparent 0);
+  background-size: 2px 2px;
+}
+
+.title-bar {
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+}
+
+.cursor-block {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background-color: #00003c;
+  animation: blink-block 1s step-end infinite;
+  vertical-align: middle;
+}
+
+@keyframes blink-block {
+  50% { opacity: 0; }
+}
+
+.scanline-win95 {
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.03);
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation: scan-win95 8s linear infinite;
+  z-index: 100;
+}
+
+@keyframes scan-win95 {
+  from { top: 0; }
+  to { top: 100%; }
+}
+
+/* Era 2026s (Modern AI/Vibrant UI Theme) */
+.theme-amber.era-2026s,
+.theme-blue.era-2026s,
+.theme-rose.era-2026s,
+.theme-green.era-2026s,
+.era-2026s {
+  --theme-primary: #a855f7; /* Vibrant Purple */
+  --theme-on-primary-fixed: #ffffff;
+  --theme-on-primary: #ffffff;
+  --theme-primary-container: #3b0764; /* Deep Purple */
+  --theme-on-primary-container: #e9d5ff;
+  --theme-primary-fixed: #f3e8ff;
+  --theme-primary-light: #c084fc;
+  --theme-glow: rgba(168, 85, 247, 0.6);
+  --theme-glow-light: rgba(168, 85, 247, 0.15);
+  --theme-glow-border: rgba(168, 85, 247, 0.3);
+
+  --color-surface-container-lowest: #0b0615; /* Deep space black */
+  --color-surface-container-high: #1d1236;
+  --color-surface-container-low: #140b27;
+  --color-surface-container: #170d2f;
+  --color-surface-container-highest: #281845;
+  --color-background: #080310; /* Pitch dark space */
+  --color-surface: #0b0615;
+  --color-surface-dim: #06030a;
+  --color-surface-bright: #281845;
+  --color-on-surface: #f3f0f7;
+  --color-on-surface-variant: #a78bfa; /* Soft violet/indigo */
+  --color-on-background: #f3f0f7;
+  --color-primary-fixed-dim: #d8b4fe; /* Lighter Purple */
+}
+
+/* Dynamic Font Overrides in 2026s Era */
+.era-2026s {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+.era-2026s h1,
+.era-2026s h2,
+.era-2026s h3,
+.era-2026s .font-label-caps,
+.era-2026s .font-mono,
+.era-2026s .font-body-lg {
+  font-family: 'Outfit', sans-serif !important;
+}
+
+/* Glassmorphism & Modern UI Effects for 2026s */
+.era-2026s .glass-panel {
+  background: rgba(23, 13, 47, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(168, 85, 247, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Override raised/sunken bevels with modern styles */
+.era-2026s .bevel-raised {
+  background: rgba(23, 13, 47, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(168, 85, 247, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 0 0 15px rgba(168, 85, 247, 0.15) !important;
+  transform: none !important;
+}
+
+.era-2026s .bevel-sunken {
+  background: rgba(11, 6, 21, 0.8) !important;
+  border: 1px solid rgba(168, 85, 247, 0.15) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 2px 8px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+.era-2026s .bevel-active:active {
+  transform: scale(0.98) !important;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Modern 2026 Scrollbars */
+.era-2026s ::-webkit-scrollbar {
+  width: 8px;
+  background: rgba(11, 6, 21, 0.5);
+}
+
+.era-2026s ::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border-radius: 4px;
+}
+
+.era-2026s ::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.6);
+}
+
+/* Modern Pill Input styling for ChatInput.tsx in 2026s mode */
+.era-2026s .chat-input-pill {
+  background: rgba(11, 6, 21, 0.6) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(168, 85, 247, 0.3) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15) !important;
+}
+
+.era-2026s .chat-input-large-panel {
+  border-radius: 24px !important;
+}
+
+/* Glowing text gradient welcome screen header for 2026s */
+.era-2026s .font-headline-lg {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #6366f1 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: none !important;
+}
+
+/* Force all text outside terminal/inputs/title bar/active buttons to be blue in 2000s era */
+.era-2000s :not(.cli-terminal-shell *):not(.title-bar *):not(input):not(textarea):not(.text-on-primary-fixed):not(.text-on-primary):not(.text-white) {
+  color: #000080 !important;
+}
+
+/* Vibrant Gradient Buttons for 2026s Modern UI */
+.era-2026s button.bevel-raised:not(.bg-red-600),
+.era-2026s button:not(.title-bar button):not(.bg-surface-container-lowest button):not(.bg-white\/5):not(.bg-red-600) {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 15px #a855f766 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.era-2026s button.bevel-raised:not(.bg-red-600):hover,
+.era-2026s button:not(.title-bar button):not(.bg-surface-container-lowest button):not(.bg-white\/5):not(.bg-red-600):hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6) !important;
+}
+
+.era-2026s button.bevel-raised:not(.bg-red-600):active,
+.era-2026s button:not(.title-bar button):not(.bg-surface-container-lowest button):not(.bg-white\/5):not(.bg-red-600):active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3) !important;
+}
+
