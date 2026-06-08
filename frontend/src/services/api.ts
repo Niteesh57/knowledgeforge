@@ -1,0 +1,21 @@
+import axios from 'axios';
+import type { Experience } from '../types/chat';
+
+const API_BASE_URL = 'http://localhost:8000';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const generateExperience = async (concept: string, active_folder?: string, template?: string): Promise<Experience> => {
+  const response = await apiClient.post<Experience>('/generate', { concept, active_folder, medium: active_folder, template });
+  return response.data;
+};
+
+export const generateNextCodebookSteps = async (concept: string, language: string, viz_type: string, last_step: any): Promise<{ is_finished: boolean; code_steps: any[] }> => {
+  const response = await apiClient.post('/generate-trace-steps', { concept, language, viz_type, last_step });
+  return response.data;
+};

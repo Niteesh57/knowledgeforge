@@ -11,6 +11,7 @@ interface SidebarProps {
   onDeleteSession: (id: string) => void;
   onNewChat: () => void;
   onOpenSettings: () => void;
+  onOpenHelp: () => void;
 }
 
 const CONCEPTS = [
@@ -33,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onDeleteSession,
   onNewChat,
   onOpenSettings,
+  onOpenHelp,
 }) => {
   return (
     <aside className="hidden md:flex flex-col h-screen w-64 bg-surface-container-low border-r border-[#080808] p-4 shrink-0 font-mono">
@@ -155,10 +157,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="material-symbols-outlined text-[18px]">settings</span>
           Settings
         </button>
-        <div className="text-on-surface-variant p-2 flex items-center gap-3 text-[12px] font-label-caps opacity-50">
+        <button
+          onClick={onOpenHelp}
+          className="w-full text-left text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim p-2 flex items-center gap-3 cursor-pointer text-[12px] font-label-caps transition-colors"
+        >
           <span className="material-symbols-outlined text-[18px]">help</span>
           Help (v1.0)
-        </div>
+        </button>
 
         {/* Profile Block */}
         <BevelContainer variant="sunken" className="bg-surface-container-lowest p-3 mt-2 flex items-center gap-3">

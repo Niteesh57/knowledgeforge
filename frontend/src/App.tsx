@@ -6,6 +6,7 @@ import Footer from './components/layout/Footer';
 import WelcomeScreen from './components/chat/WelcomeScreen';
 import ChatInput from './components/chat/ChatInput';
 import SettingsModal from './components/ui/SettingsModal';
+import HelpModal from './components/ui/HelpModal';
 import ComicRenderer from './components/renderers/ComicRenderer';
 import EscapeRoomRenderer from './components/renderers/EscapeRoomRenderer';
 import SimulationRenderer from './components/renderers/SimulationRenderer';
@@ -43,6 +44,7 @@ function App() {
     return era;
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
 
   // Input & Generation State
   const [concept, setConcept] = useState<string>('');
@@ -290,6 +292,7 @@ function App() {
         onDeleteSession={handleDeleteSession}
         onNewChat={handleNewChat}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenHelp={() => setIsHelpOpen(true)}
       />
 
       <main className={`flex-1 flex flex-col h-full relative overflow-hidden ${
@@ -603,6 +606,7 @@ function App() {
         onChangeEra={setGraphicsEra}
         onClearSessions={handleClearSessions}
       />
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }
