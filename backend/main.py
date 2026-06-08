@@ -14,13 +14,19 @@ app = FastAPI(title="KnowledgeForge API")
 
 @app.on_event("startup")
 async def startup_event():
-    """Pre-warm the in-memory comic canvas index on startup."""
+    """Pre-warm the in-memory indices on startup."""
     try:
         from app.db.comic_canvas_db import ingest_canvases
         from app.db.canvas_library import ALL_CANVASES
         ingest_canvases(ALL_CANVASES)
+        print("[Startup] Loaded comic canvases.")
+        
+        # Load Memes
+        from app.db.meme_db import load_memes
+        load_memes()
+        print("[Startup] Loaded meme database.")
     except Exception as e:
-        print(f"[Startup] Canvas index skipped: {e}")
+        print(f"Error during startup indexing: {e}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +40,7 @@ class GenerateRequest(BaseModel):
     concept: str
     medium: Optional[str] = None
     template: Optional[str] = None
+    active_folder: Optional[str] = None
 
 class TraceNextRequest(BaseModel):
     concept: str
@@ -41,11 +48,11 @@ class TraceNextRequest(BaseModel):
     viz_type: str
     last_step: Dict[str, Any]
 
-async def generate_experience(concept: str, selected_medium: Optional[str] = None, selected_template: Optional[str] = None):
-    initial_state = {
-        "concept": concept,
-        "selected_medium": selected_medium,
-        "selected_template": selected_template,
+async def generate_experience(request: GenerateRequest):
+    state = {
+        "concept": request.concept,
+        "selected_medium": request.medium,
+        "selected_template": request.template,
         "router_decision": None,
         "template": None,
         "title": None,
@@ -53,19 +60,33 @@ async def generate_experience(concept: str, selected_medium: Optional[str] = Non
         "content": None
     }
     
-    result = await app_graph.ainvoke(initial_state)
+    folder = request.active_folder or request.medium
+    if folder == "SIMULATION":
+        from app.agents.simulation_agent import generate_simulation
+        result = await generate_simulation(state)
+    elif folder == "COMIC":
+        from app.agents.comic_agent import generate_comic
+        result = await generate_comic(state)
+    elif folder == "CODEBOOK":
+        from app.agents.codebook_agent import generate_codebook
+        result = await generate_codebook(state)
+    elif folder == "MEME":
+        from app.agents.meme_agent import generate_meme_article
+        result = await generate_meme_article(state)
+    else:
+        result = await app_graph.ainvoke(state)
     
     return {
-        "medium": result["router_decision"],
-        "template": result["template"],
-        "title": result["title"],
-        "description": result["description"],
-        "content": result["content"]
+        "medium": result.get("router_decision") or folder,
+        "template": result.get("template"),
+        "title": result.get("title"),
+        "description": result.get("description"),
+        "content": result.get("content")
     }
 
 @app.post("/generate")
 async def generate_endpoint(request: GenerateRequest):
-    result = await generate_experience(request.concept, request.medium, request.template)
+    result = await generate_experience(request)
     return result
 
 @app.post("/generate-trace-steps")

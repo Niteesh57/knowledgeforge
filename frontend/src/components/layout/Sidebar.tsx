@@ -1,0 +1,184 @@
+import React from 'react';
+import type { Session } from '../../types/chat';
+import BevelContainer from '../ui/BevelContainer';
+
+interface SidebarProps {
+  sessions: Session[];
+  currentSessionId: string | null;
+  activeFolder: string | null;
+  onSelectFolder: (folder: string | null) => void;
+  onSelectSession: (id: string) => void;
+  onDeleteSession: (id: string) => void;
+  onNewChat: () => void;
+  onOpenSettings: () => void;
+}
+
+const CONCEPTS = [
+  { id: 'GAME', label: 'Gaming', icon: 'sports_esports' },
+  { id: 'COMIC', label: 'Comics', icon: 'auto_stories' },
+  { id: 'CLI', label: 'CLI Simulator', icon: 'terminal' },
+  { id: 'BROWSER', label: 'Browser Simulator', icon: 'web' },
+  { id: 'CODEBOOK', label: 'Codebook', icon: 'code' },
+  { id: 'ESCAPE_ROOM', label: 'Escape Room', icon: 'vpn_key' },
+  { id: 'SIMULATION', label: 'Simulation', icon: 'science' },
+  { id: 'MEME', label: 'Meme Explainer', icon: 'sentiment_very_satisfied' },
+];
+
+export const Sidebar: React.FC<SidebarProps> = ({
+  sessions,
+  currentSessionId,
+  activeFolder,
+  onSelectFolder,
+  onSelectSession,
+  onDeleteSession,
+  onNewChat,
+  onOpenSettings,
+}) => {
+  return (
+    <aside className="hidden md:flex flex-col h-screen w-64 bg-surface-container-low border-r border-[#080808] p-4 shrink-0 font-mono">
+      {/* Brand Header */}
+      <div className="mb-6 px-2 fade-in-slide flex flex-col gap-1">
+        <div className="font-label-caps text-primary-fixed-dim tracking-widest flex items-center gap-2 text-[14px]">
+          <span className="material-symbols-outlined text-[20px]">terminal</span>
+          Action Play
+        </div>
+        <div className="text-[11px] text-on-surface-variant mt-1 opacity-70">
+          KnowledgeForge Interface
+        </div>
+        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 mt-1.5 rounded bg-primary-fixed-dim/15 border border-primary-fixed-dim/30 text-[9px] font-bold tracking-wider text-primary-fixed-dim self-start font-mono select-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+          POWERED BY FOUNDRY IQ
+        </div>
+      </div>
+
+      {/* Sessions / Folders Section */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {!activeFolder ? (
+          <>
+            <div className="text-on-surface-variant font-label-caps text-[10px] px-2 mb-2 tracking-wider opacity-60">
+              [ CONCEPT_FOLDERS ]
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-1 pr-1">
+              {CONCEPTS.map((concept) => (
+                <div
+                  key={concept.id}
+                  className="group flex items-center justify-between p-2 text-[12px] font-label-caps transition-all text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim cursor-pointer"
+                  onClick={() => onSelectFolder(concept.id)}
+                >
+                  <span className="truncate pr-2 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px]">
+                      {concept.icon}
+                    </span>
+                    {concept.label}
+                  </span>
+                  <span className="material-symbols-outlined text-[14px] opacity-50 group-hover:opacity-100 transition-opacity">
+                    chevron_right
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-2 mb-4">
+              <button
+                onClick={() => onSelectFolder(null)}
+                className="w-full text-left text-on-surface-variant hover:text-primary-fixed-dim p-2 flex items-center gap-2 transition-colors cursor-pointer text-[11px] font-label-caps"
+              >
+                <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+                Back to Folders
+              </button>
+              <button
+                onClick={onNewChat}
+                className="w-full text-left font-bold text-primary-fixed-dim border-l-2 border-primary-fixed-dim bg-surface-container p-2 flex items-center gap-3 transition-all hover:brightness-110 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[20px]">add</span>
+                <span className="text-[12px] font-label-caps">New Chat</span>
+              </button>
+            </div>
+
+            <div className="text-on-surface-variant font-label-caps text-[10px] px-2 mb-2 tracking-wider opacity-60 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[12px]">folder_open</span>
+              [ {CONCEPTS.find(c => c.id === activeFolder)?.label.toUpperCase()} SESSIONS ]
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-1 pr-1">
+              {sessions.length === 0 ? (
+                <div className="text-on-surface-variant/40 text-[10px] italic px-2 py-4">
+                  EMPTY FOLDER
+                </div>
+              ) : (
+                sessions.map((session) => {
+                  const isActive = session.id === currentSessionId;
+                  return (
+                    <div
+                      key={session.id}
+                      className={`group flex items-center justify-between p-2 text-[12px] font-label-caps transition-all ${
+                        isActive
+                          ? 'bg-surface-container text-primary-fixed-dim border-l-2 border-primary-fixed-dim'
+                          : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim cursor-pointer'
+                      }`}
+                      onClick={() => onSelectSession(session.id)}
+                    >
+                      <span className="truncate pr-2 flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[14px]">
+                          chat_bubble_outline
+                        </span>
+                        {session.name || 'Untitled Generation'}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteSession(session.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 hover:text-red-500 p-1 cursor-pointer transition-opacity"
+                        title="Delete Session"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Sidebar Footer */}
+      <div className="mt-auto pt-4 border-t border-[#2a2a2a] space-y-2">
+        <button
+          onClick={onOpenSettings}
+          className="w-full text-left text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim p-2 flex items-center gap-3 cursor-pointer text-[12px] font-label-caps transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">settings</span>
+          Settings
+        </button>
+        <div className="text-on-surface-variant p-2 flex items-center gap-3 text-[12px] font-label-caps opacity-50">
+          <span className="material-symbols-outlined text-[18px]">help</span>
+          Help (v1.0)
+        </div>
+
+        {/* Profile Block */}
+        <BevelContainer variant="sunken" className="bg-surface-container-lowest p-3 mt-2 flex items-center gap-3">
+          <div className="w-8 h-8 bg-surface-container-highest flex items-center justify-center bevel-raised shrink-0">
+            <span className="material-symbols-outlined text-primary-fixed-dim text-[20px]">
+              account_circle
+            </span>
+          </div>
+          <div className="overflow-hidden">
+            <div className="text-[10px] font-label-caps text-primary-fixed-dim truncate">
+              ROOT_ADMIN
+            </div>
+            <div className="text-[9px] text-on-surface-variant opacity-50 truncate">
+              ID: 0x8F32A
+            </div>
+          </div>
+        </BevelContainer>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;

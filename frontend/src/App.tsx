@@ -14,6 +14,7 @@ import BrowserRenderer from './components/renderers/BrowserRenderer';
 import GameRenderer from './components/renderers/GameRenderer';
 import CodebookRenderer from './components/renderers/CodebookRenderer';
 import GameProposalRenderer from './components/renderers/GameProposalRenderer';
+import MemeRenderer from './components/renderers/MemeRenderer';
 import type { GameProposalOption } from './types/chat';
 
 function App() {
@@ -251,6 +252,8 @@ function App() {
         return <GameRenderer data={interaction.experience} />;
       case 'CODEBOOK':
         return <CodebookRenderer data={interaction.experience} concept={interaction.concept} />;
+      case 'MEME':
+        return <MemeRenderer data={interaction.experience} />;
       case 'GAME_PROPOSAL':
         return <GameProposalRenderer data={interaction.experience} onSelect={(opt) => handleProposalSelect(interaction.concept, opt)} isLoading={loading} />;
       default:
