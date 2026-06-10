@@ -215,7 +215,7 @@ export interface GameProposalOption {
 // ─── Core Experience Types ────────────────────────────────────────────────────
 
 export interface Experience {
-  medium: 'COMIC' | 'ESCAPE_ROOM' | 'SIMULATION' | 'CLI' | 'BROWSER' | 'GAME' | 'CODEBOOK' | 'GAME_PROPOSAL';
+  medium: 'COMIC' | 'ESCAPE_ROOM' | 'SIMULATION' | 'CLI' | 'BROWSER' | 'GAME' | 'CODEBOOK' | 'GAME_PROPOSAL' | 'MEME';
   template: string;
   title: string;
   description: string;

@@ -141,6 +141,21 @@ def get_comic_clusters():
         })
     return {"clusters": clusters}
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to KnowledgeForge API"}
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Serve static files from the built frontend directory
+frontend_dist_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+if os.path.exists(frontend_dist_path):
+    app.mount("/", StaticFiles(directory=frontend_dist_path, html=True), name="static")
+
+    @app.get("/{catchall:path}")
+    async def serve_react_app(catchall: str):
+        index_path = os.path.join(frontend_dist_path, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"message": f"Path not found: {catchall}"}
+else:
+    @app.get("/")
+    def read_root():
+        return {"message": "Welcome to KnowledgeForge API (Static assets not compiled)"}
