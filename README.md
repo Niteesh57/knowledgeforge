@@ -60,10 +60,15 @@ graph TD
         Meme -.->|Meme Dataset Parses| FIQ
     end
     
-    classDef default fill:#bbf,stroke:#333,stroke-width:1px;
-    classDef agent fill:#bbf,stroke:#333,stroke-width:1px;
+    classDef backend fill:#00334d,stroke:#00bfff,stroke-width:2px,color:#fff;
+    classDef agent fill:#002203,stroke:#00e639,stroke-width:2px,color:#fff;
+    classDef foundry fill:#2a0013,stroke:#ff007f,stroke-width:2px,color:#fff;
     
-    style FoundryLayer fill:#ebd4ff,stroke:#a855f7,stroke-width:2px,stroke-dasharray: 5 5
+    class LGS,Orch,Router backend;
+    class CLI,Browser,Game,Escape,Codebook,Sim,Comic,Meme agent;
+    class FIQ foundry;
+    
+    style FoundryLayer fill:#ebd4ff,stroke:#a855f7,stroke-width:2px,stroke-dasharray: 5 5,color:#000
 ```
 
 ### 1. Stateful Multi-Agent Orchestration (LangGraph & LangChain)
