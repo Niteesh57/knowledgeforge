@@ -43,40 +43,27 @@ KnowledgeForge is engineered using a state-of-the-art distributed agentic design
 
 ```mermaid
 graph TD
-    UI[React Single Page App<br/>Vite + TypeScript] -->|REST API JSON| API[FastAPI Server Runner]
-    API -->|AgentState Context| Orchestrator{Foundry IQ Orchestrator<br/>LangGraph State Flow}
+    LGS[LangGraph State] --> Orch[Orchestrator Agent]
+    Orch --> Router{Agent Router}
     
-    Orchestrator -->|Conditional Route| Comic[Comic Agent<br/>Storyboards]
-    Orchestrator -->|Conditional Route| Codebook[Codebook Agent<br/>Visual Algorithms]
-    Orchestrator -->|Conditional Route| Game[Game Agent<br/>Playable Maps]
-    Orchestrator -->|Conditional Route| CLI[CLI Agent<br/>Sandboxed Terminal]
-    Orchestrator -->|Conditional Route| Browser[Browser Agent<br/>Cloud Simulator]
-    Orchestrator -->|Conditional Route| Escape[Escape Room Agent<br/>Puzzles]
-    Orchestrator -->|Conditional Route| Sim[Simulation Agent<br/>Topologies]
-    Orchestrator -->|Conditional Route| Meme[Meme Agent<br/>Developer Humor]
+    Router -.-> CLI[CLI Agent]
+    Router -.-> Browser[Browser Agent]
+    Router -.-> Game[Game Agent]
+    Router -.-> Escape[Escape Room Agent]
+    Router -.-> Codebook[Codebook Agent]
+    Router -.-> Sim[Simulation Agent]
+    Router -.-> Comic[Comic Agent]
+    Router -.-> Meme[Meme Agent]
     
-    Comic --> DB[(Azure AI Search<br/>Hybrid Retrieval)]
-    Meme --> DB
-    Game --> DB
+    subgraph FoundryLayer [Foundry IQ Layer]
+        Comic -.->|Canvas Library SVGs/HTML| FIQ(Foundry IQ)
+        Meme -.->|Meme Dataset Parses| FIQ
+    end
     
-    Codebook --> Out([JSON Render Schema])
-    CLI --> Out
-    Browser --> Out
-    Escape --> Out
-    Sim --> Out
-    DB --> Out
+    classDef default fill:#bbf,stroke:#333,stroke-width:1px;
+    classDef agent fill:#bbf,stroke:#333,stroke-width:1px;
     
-    Out -->|Type-Safe Props| UI
-    
-    classDef frontend fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#fff;
-    classDef backend fill:#00334d,stroke:#00bfff,stroke-width:2px,color:#fff;
-    classDef agent fill:#002203,stroke:#00e639,stroke-width:2px,color:#fff;
-    classDef db fill:#2a0013,stroke:#ff007f,stroke-width:2px,color:#fff;
-    
-    class UI frontend;
-    class API,Orchestrator,Out backend;
-    class Comic,Codebook,Game,CLI,Browser,Escape,Sim,Meme agent;
-    class DB db;
+    style FoundryLayer fill:#ebd4ff,stroke:#a855f7,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 ### 1. Stateful Multi-Agent Orchestration (LangGraph & LangChain)
