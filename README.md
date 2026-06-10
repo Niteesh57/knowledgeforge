@@ -1,4 +1,9 @@
 # 🔮 KnowledgeForge
+
+<div align="center">
+  <img src="./frontend/src/assets/KnowledgeForge.png" alt="KnowledgeForge Cover Image" width="100%">
+</div>
+
 > **Powered by a Multi-Agent AI Orchestrator**  
 > *Transforming AI output from passive reading into immersive, interactive, and memorable learning sandboxes.*
 
