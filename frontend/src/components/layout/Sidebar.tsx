@@ -16,13 +16,13 @@ interface SidebarProps {
 
 const CONCEPTS = [
   { id: 'GAME', label: 'Gaming', icon: 'sports_esports' },
-  { id: 'COMIC', label: 'Comics', icon: 'auto_stories' },
-  { id: 'CLI', label: 'CLI Simulator', icon: 'terminal' },
-  { id: 'BROWSER', label: 'Browser Simulator', icon: 'web' },
+  { id: 'COMIC', label: 'Comics', icon: 'auto_stories', badge: 'FOUNDRY IQ' },
+  { id: 'CLI', label: 'CLI', icon: 'terminal' },
+  { id: 'BROWSER', label: 'Browser', icon: 'web' },
   { id: 'CODEBOOK', label: 'Codebook', icon: 'code' },
   { id: 'ESCAPE_ROOM', label: 'Escape Room', icon: 'vpn_key' },
   { id: 'SIMULATION', label: 'Simulation', icon: 'science' },
-  { id: 'MEME', label: 'Meme Explainer', icon: 'sentiment_very_satisfied' },
+  { id: 'MEME', label: 'Meme', icon: 'sentiment_very_satisfied', badge: 'FOUNDRY IQ' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -72,6 +72,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {concept.icon}
                     </span>
                     {concept.label}
+                    {concept.badge && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded text-[8px] bg-primary-fixed-dim/20 text-primary-fixed-dim border border-primary-fixed-dim/30 whitespace-nowrap animate-badge-shine">
+                        {concept.badge}
+                      </span>
+                    )}
                   </span>
                   <span className="material-symbols-outlined text-[14px] opacity-50 group-hover:opacity-100 transition-opacity">
                     chevron_right
@@ -114,11 +119,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   return (
                     <div
                       key={session.id}
-                      className={`group flex items-center justify-between p-2 text-[12px] font-label-caps transition-all ${
-                        isActive
-                          ? 'bg-surface-container text-primary-fixed-dim border-l-2 border-primary-fixed-dim'
-                          : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim cursor-pointer'
-                      }`}
+                      className={`group flex items-center justify-between p-2 text-[12px] font-label-caps transition-all ${isActive
+                        ? 'bg-surface-container text-primary-fixed-dim border-l-2 border-primary-fixed-dim'
+                        : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed-dim cursor-pointer'
+                        }`}
                       onClick={() => onSelectSession(session.id)}
                     >
                       <span className="truncate pr-2 flex items-center gap-1.5">

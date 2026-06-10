@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, Any, List
 from langchain_core.prompts import PromptTemplate
+from groq import AsyncGroq
 from app.config import get_llm
 from app.db.meme_db import query_memes
 from app.graph.state import AgentState
@@ -57,14 +58,52 @@ async def generate_meme_article(state: AgentState) -> Dict[str, Any]:
     # Get 3-4 relevant memes
     memes = query_memes(concept, n_results=3)
     
+    client = AsyncGroq(api_key=os.environ.get("GROQ_API_KEY"))
+    
     # Format memes for the prompt
     memes_context = ""
     for i, m in enumerate(memes):
+        image_url = m.get('image_url', '')
+        image_description = ""
+        
+        if image_url:
+            try:
+                completion = await client.chat.completions.create(
+                    model="meta-llama/llama-4-scout-17b-16e-instruct",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "What's in this image? Describe it briefly to help generate a story."
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": image_url
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    temperature=1,
+                    max_completion_tokens=1024,
+                    top_p=1,
+                    stream=False,
+                    stop=None,
+                )
+                image_description = completion.choices[0].message.content
+            except Exception as e:
+                print(f"Failed to get image description: {e}")
+                
         memes_context += f"Meme {i+1}:\n"
         memes_context += f"Title: {m.get('title')}\n"
-        memes_context += f"Image URL: {m.get('image_url')}\n"
+        memes_context += f"Image URL: {image_url}\n"
         memes_context += f"URL: {m.get('url')}\n"
         memes_context += f"Caption: {m.get('image_caption', 'N/A')}\n"
+        if image_description:
+            memes_context += f"Visual Description: {image_description}\n"
         memes_context += f"Context: {' '.join(m.get('content', []))[:300]}...\n\n"
         
     prompt = PromptTemplate.from_template(MEME_PROMPT)

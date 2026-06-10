@@ -1,7 +1,7 @@
-# 🔮 KnowledgeForge
+# <img src="./frontend/public/favicon.png" width="40" align="top"> KnowledgeForge
 
 <div align="center">
-  <img src="./frontend/src/assets/KnowledgeForge.png" alt="KnowledgeForge Cover Image" width="100%">
+  <img src="./frontend/src/assets/KnowledgeForge.png" alt="KnowledgeForge Cover Image" width="100%" height="500">
 </div>
 
 > **Powered by a Multi-Agent AI Orchestrator**  
@@ -41,43 +41,42 @@ Four retro-themed color palettes are available:
 
 KnowledgeForge is engineered using a state-of-the-art distributed agentic design, incorporating stateful state machines, hybrid retrieval-augmented generation (RAG), and client-side system virtualization.
 
-```
-                     ┌──────────────────────────────┐
-                     │     React Single Page App    │
-                     │  (Vite + TypeScript + HMR)   │
-                     └──────────────┬───────────────┘
-                                    │
-                               REST API (JSON)
-                                    │
-                     ┌──────────────▼───────────────┐
-                     │    FastAPI Server Runner     │
-                     │  (Asynchronous I/O Handles)  │
-                     └──────────────┬───────────────┘
-                                    │
-                       State Machine Invocation
-                                    │
-                     ┌──────────────▼───────────────┐
-                     │     LangGraph State Flow     │
-                     │     (AgentState Context)     │
-                     └──────────────┬───────────────┘
-                                    │
-                 ┌──────────────────┼──────────────────┐
-                 │                  │                  │
-        Conditional Route    Conditional Route  Conditional Route
-                 │                  │                  │
-        ┌────────▼────────┐┌────────▼────────┐┌────────▼────────┐
-        │  Comic Agent    ││  Codebook Agent ││   Game Agent    │
-        │  (Storyboards)  ││ (Code Visuals)  ││ (Playable maps) │
-        └────────┬────────┘└────────┬────────┘└────────┬────────┘
-                 │                  │                  │
-                 └──────────────────┼──────────────────┘
-                                    │
-                       Hybrid Retrieval Queries
-                                    │
-                     ┌──────────────▼───────────────┐
-                     │       Azure AI Search        │
-                     │  (vector lookup + fallbacks) │
-                     └──────────────────────────────┘
+```mermaid
+graph TD
+    UI[React Single Page App<br/>Vite + TypeScript] -->|REST API JSON| API[FastAPI Server Runner]
+    API -->|AgentState Context| Orchestrator{Foundry IQ Orchestrator<br/>LangGraph State Flow}
+    
+    Orchestrator -->|Conditional Route| Comic[Comic Agent<br/>Storyboards]
+    Orchestrator -->|Conditional Route| Codebook[Codebook Agent<br/>Visual Algorithms]
+    Orchestrator -->|Conditional Route| Game[Game Agent<br/>Playable Maps]
+    Orchestrator -->|Conditional Route| CLI[CLI Agent<br/>Sandboxed Terminal]
+    Orchestrator -->|Conditional Route| Browser[Browser Agent<br/>Cloud Simulator]
+    Orchestrator -->|Conditional Route| Escape[Escape Room Agent<br/>Puzzles]
+    Orchestrator -->|Conditional Route| Sim[Simulation Agent<br/>Topologies]
+    Orchestrator -->|Conditional Route| Meme[Meme Agent<br/>Developer Humor]
+    
+    Comic --> DB[(Azure AI Search<br/>Hybrid Retrieval)]
+    Meme --> DB
+    Game --> DB
+    
+    Codebook --> Out([JSON Render Schema])
+    CLI --> Out
+    Browser --> Out
+    Escape --> Out
+    Sim --> Out
+    DB --> Out
+    
+    Out -->|Type-Safe Props| UI
+    
+    classDef frontend fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#fff;
+    classDef backend fill:#00334d,stroke:#00bfff,stroke-width:2px,color:#fff;
+    classDef agent fill:#002203,stroke:#00e639,stroke-width:2px,color:#fff;
+    classDef db fill:#2a0013,stroke:#ff007f,stroke-width:2px,color:#fff;
+    
+    class UI frontend;
+    class API,Orchestrator,Out backend;
+    class Comic,Codebook,Game,CLI,Browser,Escape,Sim,Meme agent;
+    class DB db;
 ```
 
 ### 1. Stateful Multi-Agent Orchestration (LangGraph & LangChain)
@@ -95,6 +94,9 @@ The storyboard canvas database and programmer humor templates are hosted on **Az
 *   **FastAPI & Asynchronous I/O:** Built completely on FastAPI’s ASGI interface, utilizing Python's `asyncio` loop to handle concurrent generation requests and database queries without blocking.
 *   **High-Throughput Static Serving:** Using `starlette`'s static mounts backed by `aiofiles`, the compiled React production bundle is served directly from Python memory, reducing hosting requirements to a single container while maintaining low TTFB (Time to First Byte).
 *   **Type-Safe UI Pipelines:** Built with TypeScript compiler-level validations (`tsc -b`), ensuring that backend JSON contracts align perfectly with the React render interface.
+
+### 4. Multi-Modal Vision Integration
+To generate highly accurate narratives for visual mediums (like Memes), the backend integrates **Vision AI**. The orchestrator dynamically queries the Groq Vision API (utilizing models like `meta-llama/llama-4-scout-17b-16e-instruct`), passing image URLs to extract visual semantic descriptions. This visual context is injected directly into the LLM prompt, ensuring the generated story perfectly understands the visual joke or image layout.
 
 ---
 
