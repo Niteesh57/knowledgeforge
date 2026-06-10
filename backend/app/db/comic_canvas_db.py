@@ -1,50 +1,93 @@
-"""
-Comic Canvas Store — fast in-memory dictionary lookup.
-No internet required, no embedding model needed.
-The LLM already specifies exact character/background/pose in its JSON script,
-so we do a direct lookup by (cluster, character, background, pose).
-Semantic canvas_query matching is done with simple keyword scoring offline.
-"""
+import os
+import json
+import requests
 from typing import List, Dict, Any, Optional
 
-# ─── In-memory index (built at import time from canvas_library) ──────────────
-_canvas_index: Dict[str, Dict[str, Any]] = {}   # id → canvas
-_cluster_index: Dict[str, List[Dict[str, Any]]] = {}  # cluster → [canvases]
+AZURE_SEARCH_ENDPOINT = os.environ.get("AZURE_SEARCH_ENDPOINT")
+AZURE_SEARCH_KEY = os.environ.get("AZURE_SEARCH_KEY")
+AZURE_SEARCH_INDEX = os.environ.get("AZURE_SEARCH_INDEX")
 
-_initialized = False
-
-
-def _ensure_initialized():
-    global _initialized
-    if _initialized:
-        return
-    from app.db.canvas_library import ALL_CANVASES
-    for c in ALL_CANVASES:
-        _canvas_index[c["id"]] = c
-        _cluster_index.setdefault(c["cluster"], []).append(c)
-    _initialized = True
-    print(f"[CanvasStore] Loaded {len(_canvas_index)} canvases into memory.")
-
+headers = {
+    "Content-Type": "application/json",
+    "api-key": AZURE_SEARCH_KEY
+}
 
 def ingest_canvases(canvases: list):
-    """Populate the in-memory index (replaces ChromaDB ingest)."""
-    global _initialized
-    for c in canvases:
-        _canvas_index[c["id"]] = c
-        _cluster_index.setdefault(c["cluster"], []).append(c)
-    _initialized = True
-    print(f"[CanvasStore] Indexed {len(_canvas_index)} canvases.")
+    """Ingest canvases into Azure Cognitive Search knowledge-forge-index if not already present."""
+    # Check if canvases are already in the index
+    check_url = f"{AZURE_SEARCH_ENDPOINT.rstrip('/')}/indexes/{AZURE_SEARCH_INDEX}/docs/search?api-version=2023-11-01"
+    check_payload = {
+        "filter": "cluster ne 'meme'",
+        "top": 1,
+        "select": "id"
+    }
+    try:
+        response = requests.post(check_url, headers=headers, json=check_payload)
+        if response.status_code == 200:
+            existing_docs = response.json().get("value", [])
+            if existing_docs:
+                print(f"[CanvasStore] Canvases already present in Azure Search index '{AZURE_SEARCH_INDEX}'. Skipping ingestion.")
+                return
+        else:
+            print(f"[CanvasStore] Failed to check existing canvases. Status: {response.status_code}, Response: {response.text}")
+    except Exception as e:
+        print(f"[CanvasStore] Exception checking canvases: {e}")
 
+    print(f"[CanvasStore] Ingesting {len(canvases)} canvases into Azure Search index '{AZURE_SEARCH_INDEX}'...")
+    documents = []
+    for canvas in canvases:
+        doc = {
+            "@search.action": "upload",
+            "id": canvas["id"],
+            "content": canvas["description"],
+            "description": canvas["description"],
+            "cluster": canvas["cluster"],
+            "character": canvas["character"],
+            "background": canvas["background"],
+            "pose": canvas["pose"],
+            "metadata": json.dumps({
+                "css_bundle": canvas["css_bundle"],
+                "canvas_html": canvas["canvas_html"]
+            })
+        }
+        documents.append(doc)
 
-def _keyword_score(query: str, canvas: Dict[str, Any]) -> int:
-    """Simple keyword overlap score between query and canvas description."""
-    query_words = set(query.lower().split())
-    desc_words = set(canvas["description"].lower().split())
-    char_words = set(canvas["character"].lower().replace("-", " ").split())
-    bg_words = set(canvas["background"].lower().replace("-", " ").replace("bg", "").split())
-    all_words = desc_words | char_words | bg_words
-    return len(query_words & all_words)
+    # Upload in batches of 100
+    batch_size = 100
+    for i in range(0, len(documents), batch_size):
+        batch = documents[i:i+batch_size]
+        payload = {"value": batch}
+        try:
+            url = f"{AZURE_SEARCH_ENDPOINT.rstrip('/')}/indexes/{AZURE_SEARCH_INDEX}/docs/index?api-version=2023-11-01"
+            res = requests.post(url, headers=headers, json=payload)
+            if res.status_code == 200:
+                res_json = res.json()
+                success_count = sum(1 for item in res_json.get("value", []) if item.get("status"))
+                print(f"[CanvasStore] Batch {i//batch_size + 1}: successfully uploaded {success_count}/{len(batch)} canvases.")
+            else:
+                print(f"[CanvasStore] Batch {i//batch_size + 1} failed: Status {res.status_code}, Response: {res.text}")
+        except Exception as e:
+            print(f"[CanvasStore] Batch {i//batch_size + 1} exception: {e}")
 
+def _parse_search_doc(doc: Dict[str, Any]) -> Dict[str, Any]:
+    """Parse retrieved search document and reconstruct the canvas library dictionary."""
+    meta = {}
+    if doc.get("metadata"):
+        try:
+            meta = json.loads(doc["metadata"])
+        except Exception:
+            pass
+            
+    return {
+        "id": doc.get("id"),
+        "description": doc.get("description"),
+        "cluster": doc.get("cluster"),
+        "character": doc.get("character"),
+        "background": doc.get("background"),
+        "pose": doc.get("pose"),
+        "css_bundle": meta.get("css_bundle", ""),
+        "canvas_html": meta.get("canvas_html", "")
+    }
 
 def query_canvas(
     description: str,
@@ -55,52 +98,67 @@ def query_canvas(
     n_results: int = 1
 ) -> List[Dict[str, Any]]:
     """
-    Look up the best matching canvas.
-    Priority:
+    Look up the best matching canvas in Azure Cognitive Search.
+    Priority fallback:
     1. Exact match by (cluster, character, background, pose)
     2. Partial match by (cluster, character, background)
-    3. Keyword score across the cluster
+    3. Character match (any background, any pose)
+    4. Keyword score across the cluster (matching description)
+    5. Fallback: first canvas in cluster
     """
-    _ensure_initialized()
-    cluster_canvases = _cluster_index.get(cluster, [])
-    if not cluster_canvases:
-        # Try any cluster as fallback
-        cluster_canvases = list(_canvas_index.values())
+    search_url = f"{AZURE_SEARCH_ENDPOINT.rstrip('/')}/indexes/{AZURE_SEARCH_INDEX}/docs/search?api-version=2023-11-01"
 
-    # 1. Exact match
+    def execute_search(search_text: str, filter_expr: str, top: int) -> List[Dict[str, Any]]:
+        payload = {
+            "search": search_text,
+            "filter": filter_expr,
+            "top": top
+        }
+        try:
+            res = requests.post(search_url, headers=headers, json=payload)
+            if res.status_code == 200:
+                docs = res.json().get("value", [])
+                return [_parse_search_doc(d) for d in docs]
+        except Exception as e:
+            print(f"[CanvasStore] Query failed with exception: {e}")
+        return []
+
+    # 1. Exact match by (cluster, character, background, pose)
     if character and background and pose:
-        exact_id = f"{cluster}-{character}-{background}-{pose}"
-        if exact_id in _canvas_index:
-            return [_canvas_index[exact_id]]
+        filter_expr = f"cluster eq '{cluster}' and character eq '{character}' and background eq '{background}' and pose eq '{pose}'"
+        matches = execute_search("*", filter_expr, n_results)
+        if matches:
+            return matches
 
     # 2. Character + background match (any pose)
     if character and background:
-        matches = [
-            c for c in cluster_canvases
-            if c["character"] == character and c["background"] == background
-        ]
+        filter_expr = f"cluster eq '{cluster}' and character eq '{character}' and background eq '{background}'"
+        search_text = pose if pose else "*"
+        matches = execute_search(search_text, filter_expr, n_results)
         if matches:
-            # Prefer requested pose if available
-            if pose:
-                posed = [m for m in matches if m["pose"] == pose]
-                if posed:
-                    return posed[:n_results]
-            return matches[:n_results]
+            return matches
 
     # 3. Character match (any background, any pose)
     if character:
-        matches = [c for c in cluster_canvases if c["character"] == character]
+        filter_expr = f"cluster eq '{cluster}' and character eq '{character}'"
+        search_text = f"{background} {pose}" if background or pose else "*"
+        matches = execute_search(search_text, filter_expr, n_results)
         if matches:
-            return matches[:n_results]
+            return matches
 
     # 4. Keyword scoring across cluster
     if description:
-        scored = sorted(
-            cluster_canvases,
-            key=lambda c: _keyword_score(description, c),
-            reverse=True
-        )
-        return scored[:n_results]
+        filter_expr = f"cluster eq '{cluster}'"
+        matches = execute_search(description, filter_expr, n_results)
+        if matches:
+            return matches
 
     # 5. Fallback: first canvas in cluster
-    return cluster_canvases[:n_results]
+    filter_expr = f"cluster eq '{cluster}'"
+    matches = execute_search("*", filter_expr, n_results)
+    if matches:
+        return matches
+
+    # 6. Absolute fallback (across any cluster)
+    matches = execute_search("*", "cluster ne 'meme'", n_results)
+    return matches

@@ -197,6 +197,13 @@ const BrowserRenderer = ({ data }: BrowserRendererProps) => {
 
   const screen = screens[screenIndex];
 
+  const hasErrors = submitted && !screen.fields.every((f) => {
+    if (f.type === 'select' || f.type === 'radio') {
+      return fieldValues[f.label] === f.correct;
+    }
+    return true;
+  });
+
   const handleFieldChange = (label: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [label]: value }));
     setSubmitted(false);
@@ -381,7 +388,7 @@ const BrowserRenderer = ({ data }: BrowserRendererProps) => {
                 </div>
 
                 {/* Validation error */}
-                {submitted && (
+                {hasErrors && (
                   <p className="text-red-400 text-[12px] font-mono mt-2">
                     ✗ Fix the highlighted fields before proceeding.
                   </p>

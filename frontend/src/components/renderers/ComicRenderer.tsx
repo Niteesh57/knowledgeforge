@@ -5,13 +5,27 @@ const MAX_PAGES = 4;
 const FEMALE_CHARACTERS = ['wonderwoman', 'minnie', 'kendall', 'eleven'];
 
 const getVoiceForCharacter = (character: string, availableVoices: SpeechSynthesisVoice[]) => {
+  if (availableVoices.length === 0) return null;
   if (!character) return availableVoices[0];
   
+  const isFemale = FEMALE_CHARACTERS.includes(character.toLowerCase());
+
+  if (isFemale) {
+    const natasha = availableVoices.find(v => v.name.includes('Natasha'));
+    if (natasha) return natasha;
+    const aria = availableVoices.find(v => v.name.includes('Aria'));
+    if (aria) return aria;
+  } else {
+    const william = availableVoices.find(v => v.name.includes('William'));
+    if (william) return william;
+    const roger = availableVoices.find(v => v.name.includes('Roger'));
+    if (roger) return roger;
+  }
+
   // Filter out unstable 'Online (Natural)' voices which frequently fail with synthesis-failed
   const localVoices = availableVoices.filter(v => v.localService === true && !v.name.includes('Online'));
   const voicesToUse = localVoices.length > 0 ? localVoices : availableVoices;
 
-  const isFemale = FEMALE_CHARACTERS.includes(character.toLowerCase());
   const enVoices = voicesToUse.filter(v => v.lang.startsWith('en'));
   const voicesToSearch = enVoices.length > 0 ? enVoices : voicesToUse;
 
@@ -378,8 +392,27 @@ const ComicRenderer = ({ data }: { data: any }) => {
       window.speechSynthesis.cancel();
       
       const panel = currentPanels[activePanelIndex];
-      const cleanDialogue = (panel.dialogue || '').replace(/[*_]/g, '');
-      const characterName = (panel.character || 'Narrator').replace(/[-_]/g, ' ');
+      let cleanDialogue = (panel.dialogue || '').replace(/[*_]/g, '').trim();
+      
+      // Remove surrounding quotes if any
+      if (cleanDialogue.startsWith('"') && cleanDialogue.endsWith('"')) {
+        cleanDialogue = cleanDialogue.slice(1, -1);
+      }
+      
+      const characterName = (panel.character || 'Narrator').replace(/[-_]/g, ' ').trim();
+      
+      // Strip prefix like "Batman: " or "Batman says: " or "Batman - " case-insensitively
+      const escapedName = characterName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const prefixRegex = new RegExp(`^${escapedName}\\s*(?:says)?\\s*[:\\-]\\s*`, 'i');
+      if (prefixRegex.test(cleanDialogue)) {
+        cleanDialogue = cleanDialogue.replace(prefixRegex, '').trim();
+      }
+      
+      // Remove surrounding quotes again if they were inside the prefix
+      if (cleanDialogue.startsWith('"') && cleanDialogue.endsWith('"')) {
+        cleanDialogue = cleanDialogue.slice(1, -1);
+      }
+      
       const text = `${characterName} says: ${cleanDialogue}`;
       
       const utterance = new SpeechSynthesisUtterance(text);

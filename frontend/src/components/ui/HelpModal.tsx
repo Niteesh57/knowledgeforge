@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 
+import gameDemo from '../../assets/help/game_demo.mp4';
+import comicDemo from '../../assets/help/comic_demo.mp4';
+import cliDemo from '../../assets/help/cli_demo.mp4';
+import browserDemo from '../../assets/help/browser_demo.mp4';
+import codebookDemo from '../../assets/help/codebook_demo.mp4';
+import escaperoomDemo from '../../assets/help/escaperoom_demo.mp4';
+import simulationDemo from '../../assets/help/simulation_demo.mp4';
+import memeDemo from '../../assets/help/meme_demo.mp4';
+
 interface HelpModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -115,12 +124,25 @@ const HELP_CATEGORIES = [
   }
 ];
 
+const VIDEO_SOURCES: Record<string, string> = {
+  GAME: gameDemo,
+  COMIC: comicDemo,
+  CLI: cliDemo,
+  BROWSER: browserDemo,
+  CODEBOOK: codebookDemo,
+  ESCAPE_ROOM: escaperoomDemo,
+  SIMULATION: simulationDemo,
+  MEME: memeDemo,
+};
+
 const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState(HELP_CATEGORIES[0].id);
 
   if (!isOpen) return null;
 
   const activeCategory = HELP_CATEGORIES.find(c => c.id === activeTab) || HELP_CATEGORIES[0];
+  const videoSrc = VIDEO_SOURCES[activeCategory.id];
+  const shouldPlaySound = activeCategory.id === 'GAME' || activeCategory.id === 'COMIC';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in font-mono">
@@ -173,17 +195,29 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 <p className="text-on-surface-variant text-sm">{activeCategory.description}</p>
               </div>
 
-              {/* Media Placeholder */}
-              <div className="w-full aspect-video bg-[#0a0a0a] border border-dashed border-primary-fixed-dim/50 rounded flex flex-col items-center justify-center p-8 text-center gap-4 relative overflow-hidden group">
-                <span className="material-symbols-outlined text-4xl text-primary-fixed-dim/50 group-hover:text-primary-fixed-dim transition-colors">
-                  video_camera_front
-                </span>
-                <p className="text-primary-fixed-dim/80 text-xs font-bold leading-relaxed max-w-md">
-                  {activeCategory.mediaInstruction}
-                </p>
-                <div className="absolute top-2 left-2 px-2 py-1 bg-primary-fixed-dim/20 text-primary-fixed-dim text-[10px] font-bold rounded">
-                  MEDIA_SLOT_EMPTY
-                </div>
+              {/* Media Viewer */}
+              <div className="w-full aspect-video bg-black border border-[#2a2a2a] rounded overflow-hidden relative shadow-inner">
+                {videoSrc ? (
+                  <video
+                    key={activeCategory.id}
+                    src={videoSrc}
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    loop
+                    playsInline
+                    controls
+                    muted={!shouldPlaySound}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-8 gap-4">
+                    <span className="material-symbols-outlined text-4xl text-primary-fixed-dim/50">
+                      video_camera_front
+                    </span>
+                    <p className="text-primary-fixed-dim/80 text-xs font-bold leading-relaxed max-w-md">
+                      {activeCategory.mediaInstruction}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Instructions */}
