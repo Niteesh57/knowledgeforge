@@ -51,13 +51,22 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               placeholder="Ask anything..."
             />
 
-            {/* Mic Button */}
-            <button
-              type="button"
-              className="p-1 hover:text-primary-fixed-dim text-on-surface-variant cursor-pointer transition-colors shrink-0"
-            >
-              <span className="material-symbols-outlined text-[18px]">mic</span>
-            </button>
+            {/* Matrix animation when typing */}
+            {concept.length > 0 && (
+              <div className="p-1 text-primary-fixed-dim shrink-0 flex items-center justify-center w-[26px] h-[26px]">
+                <div className="flex gap-[2px] h-[16px] overflow-hidden text-[9px] font-mono select-none leading-none opacity-85">
+                  <div className="matrix-column-1 flex flex-col">
+                    <span>1</span><span>0</span><span>1</span><span>0</span>
+                  </div>
+                  <div className="matrix-column-2 flex flex-col">
+                    <span>0</span><span>1</span><span>0</span><span>1</span>
+                  </div>
+                  <div className="matrix-column-3 flex flex-col">
+                    <span>1</span><span>1</span><span>0</span><span>0</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Exec/Send Button */}
             <button
@@ -78,25 +87,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         </form>
 
-        {loading && (
-          <div className="flex items-center justify-center gap-2 text-on-surface-variant/80 text-[10px] tracking-wider font-label-caps mt-1">
-            <div className="flex space-x-1">
-              <div
-                className="w-1.5 h-1.5 bg-primary-fixed-dim rounded-full animate-bounce"
-                style={{ animationDelay: '0ms' }}
-              ></div>
-              <div
-                className="w-1.5 h-1.5 bg-[#ffb000] rounded-full animate-bounce"
-                style={{ animationDelay: '150ms' }}
-              ></div>
-              <div
-                className="w-1.5 h-1.5 bg-[#00bfff] rounded-full animate-bounce"
-                style={{ animationDelay: '300ms' }}
-              ></div>
-            </div>
-            <span>FORGING MATRIX...</span>
-          </div>
-        )}
       </div>
     );
   }
@@ -115,15 +105,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             placeholder="Type your command or question here... (e.g. OAuth, Kubernetes, ThreadPoolExecutor)"
           />
           <div className="flex justify-between items-center mt-2 border-t border-[#1a1a1a] pt-4">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="p-2 hover:bg-surface-container-high text-on-surface-variant transition-colors hover:text-primary-fixed-dim cursor-pointer"
-                title="Voice input"
-              >
-                <span className="material-symbols-outlined text-[20px]">mic</span>
-              </button>
-            </div>
+            {concept.length > 0 && (
+              <div className="flex gap-2 items-center">
+                <div className="p-2 text-primary-fixed-dim flex items-center justify-center w-[36px] h-[36px]" title="Keyboard Matrix Active">
+                  <div className="flex gap-[3px] h-[20px] overflow-hidden text-[11px] font-mono select-none leading-none opacity-90">
+                    <div className="matrix-column-1 flex flex-col">
+                      <span>1</span><span>0</span><span>1</span><span>0</span>
+                    </div>
+                    <div className="matrix-column-2 flex flex-col">
+                      <span>0</span><span>1</span><span>0</span><span>1</span>
+                    </div>
+                    <div className="matrix-column-3 flex flex-col">
+                      <span>1</span><span>1</span><span>0</span><span>0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <RetroButton
               type="submit"
               disabled={loading || !concept.trim()}
@@ -147,28 +145,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         </div>
       </form>
 
-      {/* Loading Bouncer */}
-      {loading && (
-        <div className="flex flex-col items-center text-on-surface-variant/85 py-4 gap-2">
-          <div className="flex space-x-2">
-            <div
-              className="w-2.5 h-2.5 bg-primary-fixed-dim rounded-full animate-bounce"
-              style={{ animationDelay: '0ms' }}
-            ></div>
-            <div
-              className="w-2.5 h-2.5 bg-[#ffb000] rounded-full animate-bounce"
-              style={{ animationDelay: '150ms' }}
-            ></div>
-            <div
-              className="w-2.5 h-2.5 bg-[#00bfff] rounded-full animate-bounce"
-              style={{ animationDelay: '300ms' }}
-            ></div>
-          </div>
-          <p className="text-[12px] font-label-caps text-center tracking-wider pulse-glow">
-            FORGING LEARNING EXPERIENCE MATRIX...
-          </p>
-        </div>
-      )}
     </div>
   );
 };
