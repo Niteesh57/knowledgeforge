@@ -64,7 +64,7 @@ function useClusterCSS(cssBundle: string | null) {
     if (!cssBundle || loadedBundles.has(cssBundle)) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `/src/assets/comic-css/${cssBundle}`;
+    link.href = `/comic-css/${cssBundle}`;
     link.id = `comic-css-${cssBundle}`;
     document.head.appendChild(link);
     loadedBundles.add(cssBundle);

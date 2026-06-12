@@ -176,6 +176,11 @@ if os.path.exists(frontend_dist_path):
 
     @app.get("/{catchall:path}")
     async def serve_react_app(catchall: str):
+        # If the requested path is a real file in the dist directory (like dynamic CSS/images), serve it
+        file_path = os.path.join(frontend_dist_path, catchall)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+
         index_path = os.path.join(frontend_dist_path, "index.html")
         if os.path.exists(index_path):
             return FileResponse(index_path)
