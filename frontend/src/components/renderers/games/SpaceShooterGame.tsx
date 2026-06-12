@@ -31,6 +31,8 @@ interface Explosion {
 
 export default function SpaceShooterGame({ level, onWin }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasWidth, setCanvasWidth] = useState(800);
   const stateRef = useRef({
     rocketX: 400,
     rocketY: 520,
@@ -54,7 +56,7 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
   const [won, setWon] = useState(false);
   const [currentTarget, setCurrentTarget] = useState('');
 
-  const W = 800;
+  const W = canvasWidth;
   const H = 560;
 
   const initGame = useCallback(() => {
@@ -65,21 +67,18 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
     // Measure label widths for alien boxes
     const ctx = canvasRef.current?.getContext('2d');
     
-    const cols = 4;
-    const totalRows = Math.ceil(items.length / cols);
-
     const aliens: Alien[] = items.map((item: any, i: number) => {
       let labelWidth = item.label.length * (FONT_SIZE * 0.6) + PADDING * 2;
       if (ctx) {
         ctx.font = `bold ${FONT_SIZE}px monospace`;
         labelWidth = ctx.measureText(item.label).width + PADDING * 2;
       }
-      const col = i % cols;
-      const row = totalRows - 1 - Math.floor(i / cols);
+      // Space out aliens in 3 distinct horizontal lanes (lanes 0, 1, 2) and stagger heights to prevent any overlapping
+      const lane = i % 3;
       return {
         id: i,
-        x: 120 + col * 170,
-        y: 60 + row * 80,
+        x: (W / 4) * (lane + 1), // lane 0: 25%, lane 1: 50%, lane 2: 75%
+        y: 60 + lane * 70,       // lane 0: 60, lane 1: 130, lane 2: 200
         label: item.label,
         order: item.order,
         width: Math.max(100, labelWidth),
@@ -140,6 +139,25 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
   };
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const newWidth = Math.floor(entry.contentRect.width);
+        if (newWidth > 0) {
+          setCanvasWidth(newWidth);
+        }
+      }
+    });
+
+    resizeObserver.observe(container);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -186,6 +204,9 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
       // Move stars
       stars.forEach(star => { star.y += star.speed; if (star.y > H) star.y = 0; });
 
+      // Keep rocket within bounds during resize
+      s.rocketX = Math.max(30, Math.min(W - 30, s.rocketX));
+
       // Rocket movement
       const speed = 0.45 * dt;
       if (s.keys['ArrowLeft'] || s.keys['KeyA']) s.rocketX = Math.max(30, s.rocketX - speed);
@@ -205,7 +226,10 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
 
       // Alien falling
       s.aliens.forEach(a => {
-        if (a.alive) {
+        const lane = a.id % 3;
+        a.x = (W / 4) * (lane + 1); // update position dynamically to support resizes
+        const isActive = a.alive && a.order < s.expectedOrder + 3;
+        if (isActive) {
           a.y += 0.015 * dt; // Very slowly drift down
         }
       });
@@ -214,7 +238,8 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
       for (let li = s.lasers.length - 1; li >= 0; li--) {
         const laser = s.lasers[li];
         for (const alien of s.aliens) {
-          if (!alien.alive) continue;
+          const isActive = alien.alive && alien.order < s.expectedOrder + 3;
+          if (!isActive) continue;
           const hw = alien.width / 2;
           if (
             laser.x > alien.x - hw &&
@@ -261,7 +286,8 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
 
       // Alien reaches bottom → lose HP
       for (const alien of s.aliens) {
-        if (alien.alive && alien.y > H - 60) {
+        const isActive = alien.alive && alien.order < s.expectedOrder + 3;
+        if (isActive && alien.y > H - 60) {
           alien.alive = false;
           alien.y = H + 100; // move off
           s.health--;
@@ -308,7 +334,8 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
       // Aliens
       ctx.font = 'bold 12px monospace';
       s.aliens.forEach(alien => {
-        if (!alien.alive) return;
+        const isActive = alien.alive && alien.order < s.expectedOrder + 3;
+        if (!isActive) return;
         const hw = alien.width / 2;
         const isTarget = alien.order === s.expectedOrder;
 
@@ -453,7 +480,7 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [onWin]);
+  }, [onWin, W]);
 
   return (
     <div
@@ -479,13 +506,16 @@ export default function SpaceShooterGame({ level, onWin }: Props) {
       </div>
 
       {/* Canvas area */}
-      <div className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center bg-[#020212]">
+      <div 
+        ref={containerRef}
+        className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center bg-[#020212] w-full"
+      >
         <canvas
           ref={canvasRef}
           width={W}
           height={H}
-          className="max-w-full max-h-full"
-          style={{ imageRendering: 'pixelated', display: 'block' }}
+          className="max-h-full"
+          style={{ imageRendering: 'pixelated', display: 'block', width: `${W}px` }}
         />
 
         {/* Game Over overlay */}
