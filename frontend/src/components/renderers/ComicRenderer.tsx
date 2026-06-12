@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateComicPage } from '../../services/api';
 
 const MAX_PAGES = 4;
 const FEMALE_CHARACTERS = ['wonderwoman', 'minnie', 'kendall', 'eleven'];
@@ -290,17 +291,7 @@ const ComicRenderer = ({ data }: { data: any }) => {
     setIsLoadingNext(true);
     try {
       const concept = data?.concept || '';
-      const res = await fetch('http://localhost:8000/generate-comic-page', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          concept,
-          cluster: clusterId,
-          page_num: 1,
-          story_so_far: ""
-        })
-      });
-      const nextData = await res.json();
+      const nextData = await generateComicPage(concept, clusterId, 1, "");
       if (nextData.panels?.length > 0) {
         setAllPages([nextData.panels]);
         setCurrentPage(0);
@@ -329,17 +320,12 @@ const ComicRenderer = ({ data }: { data: any }) => {
         .map((p: any) => p.dialogue)
         .join(' | ');
 
-      const res = await fetch('http://localhost:8000/generate-comic-page', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          concept,
-          cluster: selectedCluster,
-          page_num: allPages.length + 1,
-          story_so_far: storySoFar.slice(0, 800)
-        })
-      });
-      const nextData = await res.json();
+      const nextData = await generateComicPage(
+        concept,
+        selectedCluster,
+        allPages.length + 1,
+        storySoFar.slice(0, 800)
+      );
       if (nextData.panels?.length > 0) {
         setAllPages(prev => {
           const newPages = [...prev, nextData.panels];

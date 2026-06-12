@@ -147,7 +147,32 @@ from fastapi.responses import FileResponse
 # Serve static files from the built frontend directory
 frontend_dist_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
 if os.path.exists(frontend_dist_path):
-    app.mount("/", StaticFiles(directory=frontend_dist_path, html=True), name="static")
+    # Mount assets directory for JS/CSS and other built files
+    assets_path = os.path.join(frontend_dist_path, "assets")
+    if os.path.exists(assets_path):
+        app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+
+    # Serve specific root files individually if they exist
+    @app.get("/favicon.svg")
+    async def serve_favicon():
+        favicon_path = os.path.join(frontend_dist_path, "favicon.svg")
+        if os.path.exists(favicon_path):
+            return FileResponse(favicon_path)
+        return {"message": "Favicon not found"}
+
+    @app.get("/icons.svg")
+    async def serve_icons():
+        icons_path = os.path.join(frontend_dist_path, "icons.svg")
+        if os.path.exists(icons_path):
+            return FileResponse(icons_path)
+        return {"message": "Icons not found"}
+
+    @app.get("/")
+    async def serve_index():
+        index_path = os.path.join(frontend_dist_path, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"message": "Welcome to KnowledgeForge API"}
 
     @app.get("/{catchall:path}")
     async def serve_react_app(catchall: str):
@@ -159,3 +184,4 @@ else:
     @app.get("/")
     def read_root():
         return {"message": "Welcome to KnowledgeForge API (Static assets not compiled)"}
+

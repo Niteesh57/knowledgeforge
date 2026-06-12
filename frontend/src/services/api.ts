@@ -3,7 +3,7 @@ import type { Experience } from '../types/chat';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL !== undefined 
   ? import.meta.env.VITE_API_BASE_URL 
-  : (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port !== '8000'
+  : (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port !== '8000' && window.location.port !== '8080'
      ? 'http://localhost:8000' 
      : '');
 
@@ -23,3 +23,9 @@ export const generateNextCodebookSteps = async (concept: string, language: strin
   const response = await apiClient.post('/generate-trace-steps', { concept, language, viz_type, last_step });
   return response.data;
 };
+
+export const generateComicPage = async (concept: string, cluster: string, page_num: number, story_so_far: string): Promise<any> => {
+  const response = await apiClient.post('/generate-comic-page', { concept, cluster, page_num, story_so_far });
+  return response.data;
+};
+
