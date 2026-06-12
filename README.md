@@ -7,6 +7,16 @@
 > **Powered by a Multi-Agent AI Orchestrator**  
 > *Transforming AI output from passive reading into immersive, interactive, and memorable learning sandboxes.*
 
+**Demo Video:** [Watch on YouTube](https://www.youtube.com/watch?v=8YPDC3mczpY)  
+**Technical Writeup:** [Agents League Hackathon Project](https://innovationstudio.microsoft.com/hackathons/Agents-League-Hackathon/project/123257)  
+**Live Demo:** [Play KnowledgeForge](https://knowledgeforge-production-064c.up.railway.app/)  
+**Developer Email:** [niteesh.bv@gmail.com](mailto:niteesh.bv@gmail.com)
+
+### 📚 Essential Documentation
+- 🏗️ **[Architecture Deep Dive](./architecture.md):** Detailed breakdown of our multi-agent architecture and Foundry IQ integration.
+- 📸 **[Hackathon Proof & Details](./Proof.md):** Evidence for judges and details of the Agents League submission.
+- 💡 **[Prompt Guidance](./guidance.md):** A complete guide on what prompts to ask to explore specific games, visualizers, and interactive features.
+
 ---
 
 ## 🌟 The Philosophy: Immersive AI-Powered Learning
