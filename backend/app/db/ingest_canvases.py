@@ -1,5 +1,5 @@
 """
-Ingest canvas library into ChromaDB.
+Ingest canvas library into Microsoft Foundry IQ (Azure AI Search Index).
 Run once: python -m app.db.ingest_canvases
 """
 from app.db.comic_canvas_db import ingest_canvases

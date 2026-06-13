@@ -1,6 +1,6 @@
 """
 Comic Agent — LLM generates a JSON screenplay (NOT HTML).
-Backend queries ChromaDB for best canvas match, assembles pre-built HTML panels.
+Backend queries Microsoft Foundry IQ (Azure AI Search Index) for best canvas match, assembles pre-built HTML panels.
 """
 import json
 import re
@@ -238,7 +238,7 @@ Respond in JSON ONLY:
 
 
 async def assemble_panels(script: dict, cluster: str) -> dict:
-    """Inject dialogue/action into canvas HTML from ChromaDB."""
+    """Inject dialogue/action into canvas HTML from Microsoft Foundry IQ."""
     try:
         from app.db.comic_canvas_db import query_canvas
         panels_html = []

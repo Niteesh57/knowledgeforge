@@ -78,7 +78,7 @@ The frontend React components (like `MemeRenderer.tsx`) receive the typed JSON. 
 sequenceDiagram
     participant User as User (Browser)
     participant Agent as Comic Agent (FastAPI)
-    participant FIQ as Foundry IQ (ChromaDB)
+    participant FIQ as Foundry IQ (Azure AI Search Index)
     participant LLM as Llama-3 / Groq
     User->>Agent: Request concept & select Universe (e.g. DC Justice)
     Agent->>LLM: Generate Screenplay (character cues, dialogue, & poses)
@@ -96,7 +96,7 @@ When you choose a comic universe (e.g. DC Justice or Tom & Jerry), the Comic Age
 - The exact educational dialogue and action bubble text (e.g. "KAPOW!").
 
 **2. Layout Retrieval from Foundry IQ**
-To ensure perfect graphics and no code hallucinations, the agent never lets the LLM generate HTML or CSS. Instead, the backend queries the ChromaDB vector store using the script's `canvas_query` to find the best matching pre-built SVG/HTML panel layouts.
+To ensure perfect graphics and no code hallucinations, the agent never lets the LLM generate HTML or CSS. Instead, the backend queries the Microsoft Foundry IQ (Azure AI Search Index) using the script's `canvas_query` to find the best matching pre-built SVG/HTML panel layouts.
 
 **3. Dynamic Panel Assembly**
 The backend takes the retrieved SVG/HTML panel template and dynamically replaces placeholder tokens with the actual dialogue and actions:
