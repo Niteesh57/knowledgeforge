@@ -10,6 +10,7 @@
 ## Foundry IQ + Azure AI search Index
 ![Foundry I](./frontend/public/FoundryI.png)
 ![Foundry K](./frontend/public/FoundryK.png)
+![Azure AI Search Index](./frontend/public/Azure_AI_Search_Index.png)
 
 ## Github Copilot + VS Code
 We used GitHub Copilot and VS Code to accelerate the development of our idea, leveraging frontier models.
