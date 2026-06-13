@@ -1,0 +1,14 @@
+# Ignore git directory
+.git/
+
+# Ignore dependency directories
+node_modules/
+frontend/node_modules/
+backend/__pycache__/
+*.pyc
+
+# Ignore frontend build output (it is built in Stage 1 of Dockerfile)
+frontend/dist/
+
+# Ignore large videos
+frontend/public/videos/
